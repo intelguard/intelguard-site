@@ -418,9 +418,9 @@ const Mission = () => {
 
 const Stats = () => {
 
-  const { ref: casesRef, count: casesCount } = useAnimatedNumber(230);
+  const { ref: casesRef, count: casesCount } = useAnimatedNumber(90);
 
-  const { ref: dataRef, count: dataCount } = useAnimatedNumber(400);
+  const { ref: dataRef, count: dataCount } = useAnimatedNumber(450);
 
 
 
