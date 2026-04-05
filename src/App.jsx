@@ -420,7 +420,7 @@ const Stats = () => {
 
   const { ref: casesRef, count: casesCount } = useAnimatedNumber(90);
 
-  const { ref: dataRef, count: dataCount } = useAnimatedNumber(450);
+  const { ref: dataRef, count: dataCount } = useAnimatedNumber(6.50);
 
 
 
@@ -486,11 +486,11 @@ const Stats = () => {
 
             <h3 className="text-8xl font-bold tracking-tighter text-white mb-4 flex items-baseline gap-2">
 
-              {dataCount}<span className="text-4xl text-neutral-500 font-medium">+ GB</span>
+              {dataCount}<span className="text-4xl text-neutral-500 font-medium">+ TB</span>
 
             </h3>
 
-            <p className="text-xl text-neutral-300 font-medium tracking-wide">Illicit Material Eradicated</p>
+            <p className="text-xl text-neutral-300 font-medium tracking-wide">CSAM Databases Eradicated</p>
 
           </div>
 
