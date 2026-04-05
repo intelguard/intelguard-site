@@ -1064,14 +1064,24 @@ const Contact = () => {
 
             
 
-            <a href="mailto:leer@intelguard.org" className="inline-flex items-center justify-between text-white font-mono text-sm hover:text-blue-400 transition-colors pt-6 border-t border-white/5 relative z-10">
-
+<a href="mailto:leer@intelguard.org" className="inline-flex items-center justify-between text-white font-mono text-sm hover:text-blue-400 transition-colors pt-6 border-t border-white/5 relative z-10">
               <span>leer@intelguard.org</span>
+              <span className="flex items-center gap-1 text-[10px] text-blue-400/50">
+                Secure Channel <ShieldCheck className="w-3 h-3" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
-              <span className="flex items-center gap-1 te
-              export default function App() {
+// --- Main App Export ---
+
+export default function App() {
   return (
-    <>
+    <div className="relative min-h-screen">
       <PremiumBackground />
       <Navbar />
       <Hero />
@@ -1081,6 +1091,13 @@ const Contact = () => {
       <Partners />
       <FAQ />
       <Contact />
-    </>
+      
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-white/5 text-center">
+        <p className="text-neutral-600 text-xs tracking-widest uppercase font-bold">
+          &copy; 2026 IntelGuard Intelligence Group. All Rights Reserved.
+        </p>
+      </footer>
+    </div>
   );
 }
