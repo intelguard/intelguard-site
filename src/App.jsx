@@ -12,14 +12,13 @@ import {
   Trash2,
   Briefcase,
   Mail,
-  Verified,
   Crown,
   ShieldCheck,
   Database,
   Clock,
   ShieldAlert,
   Lock,
-  MessageSquareWarning,
+  AlertCircle,
   Menu,
   X
 } from 'lucide-react';
@@ -220,7 +219,7 @@ export default function App() {
                 <div className="lg:col-span-1">
                   <div className="sticky top-32 p-10 bg-white border border-black/5 shadow-2xl rounded-[48px] text-center">
                     <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-600/20">
-                      <MessageSquareWarning className="w-10 h-10 text-white" />
+                      <AlertCircle className="w-10 h-10 text-white" />
                     </div>
                     <h3 className="text-2xl font-black uppercase mb-4">Submit Intelligence</h3>
                     <p className="text-sm text-gray-500 font-medium mb-10 leading-relaxed">
@@ -264,7 +263,7 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           <h3 className="text-xl font-bold tracking-tight">{member.name}</h3>
                           {member.isFounder && <Crown className="w-4 h-4 text-blue-500" />}
-                          {member.isVerified && <Verified className="w-4 h-4 text-blue-500" />}
+                          {member.isVerified && <ShieldCheck className="w-4 h-4 text-blue-500" />}
                         </div>
                       </div>
                       <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-8">{member.role}</div>
