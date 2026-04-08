@@ -34,15 +34,6 @@ const LogoSVG = ({ className = "w-10 h-10" }) => (
   </svg>
 );
 
-const AgencySillhouette = ({ name }) => (
-  <div className="flex flex-col items-center justify-center opacity-40 hover:opacity-100 transition-all duration-500 grayscale hover:grayscale-0">
-    <div className="w-12 h-12 mb-2 border border-white/10 rounded-full flex items-center justify-center bg-white/5">
-      <span className="text-[10px] font-mono font-bold tracking-tighter">{name}</span>
-    </div>
-    <div className="h-px w-8 bg-blue-500/50"></div>
-  </div>
-);
-
 // --- Content Data ---
 const TEAM = [
   { name: "Boaz Acosta", role: "CEO / FOUNDER", tag: "OP-01", email: "boaz@intelguard.org", tg: "@bo_sint" },
@@ -360,8 +351,8 @@ export default function App() {
             <div className="flex flex-wrap gap-12">
               <div className="space-y-4">
                 <div className="text-[10px] font-mono text-blue-500 uppercase tracking-widest mb-6">Contact_Endpoints</div>
-                <a href="mailto:contact@intelguard.org" className="block text-[10px] font-mono text-white/40 hover:text-white uppercase transition-colors">>> General: contact@intelguard.org</a>
-                <a href="mailto:tipline@intelguard.org" className="block text-[10px] font-mono text-red-500/60 hover:text-red-500 uppercase transition-colors">>> Urgent: tipline@intelguard.org</a>
+                <a href="mailto:contact@intelguard.org" className="block text-[10px] font-mono text-white/40 hover:text-white uppercase transition-colors">{"//"} General: contact@intelguard.org</a>
+                <a href="mailto:tipline@intelguard.org" className="block text-[10px] font-mono text-red-500/60 hover:text-red-500 uppercase transition-colors">{"//"} Urgent: tipline@intelguard.org</a>
               </div>
             </div>
           </div>
