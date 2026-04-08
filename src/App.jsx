@@ -1,1103 +1,564 @@
-import React, { useState, useEffect, useRef } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { 
-
-  Shield, Activity, Database, Users, ChevronDown, 
-
-  Mail, AlertTriangle, Briefcase, Lock, ChevronUp, ExternalLink, ShieldAlert,
-
-  Search, Globe, FileText, Zap, Send, ShieldCheck
-
+  Globe, 
+  ChevronRight, 
+  ArrowRight,
+  BadgeAlert,
+  Copy,
+  CheckCircle2,
+  ExternalLink,
+  Activity,
+  Fingerprint,
+  Send,
+  Trash2,
+  Briefcase,
+  Mail,
+  Verified,
+  Crown,
+  ShieldCheck,
+  Database,
+  Clock,
+  ShieldAlert,
+  FileSearch,
+  Lock,
+  MessageSquareWarning
 } from 'lucide-react';
-
-
-
-// --- Custom Hooks ---
-
-
-
-const useScrollReveal = (threshold = 0.1) => {
-
-  const ref = useRef(null);
-
-  const [isVisible, setIsVisible] = useState(false);
-
-
-
-  useEffect(() => {
-
-    const observer = new IntersectionObserver(
-
-      ([entry]) => {
-
-        if (entry.isIntersecting) {
-
-          setIsVisible(true);
-
-        }
-
-      },
-
-      { threshold, rootMargin: "0px 0px -50px 0px" }
-
-    );
-
-
-
-    const currentRef = ref.current;
-
-    if (currentRef) observer.observe(currentRef);
-
-
-
-    return () => {
-
-      if (currentRef) observer.unobserve(currentRef);
-
-    };
-
-  }, [threshold]);
-
-
-
-  return { ref, isVisible };
-
-};
-
-
-
-const useAnimatedNumber = (end, duration = 2500) => {
-
-  const [count, setCount] = useState(0);
-
-  const { ref, isVisible } = useScrollReveal(0.5);
-
-
-
-  useEffect(() => {
-
-    if (!isVisible) return;
-
-    
-
-    let startTimestamp = null;
-
-    const step = (timestamp) => {
-
-      if (!startTimestamp) startTimestamp = timestamp;
-
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-
-      
-
-      setCount(Math.floor(easeOutQuart * end));
-
-      
-
-      if (progress < 1) {
-
-        window.requestAnimationFrame(step);
-
-      }
-
-    };
-
-    
-
-    window.requestAnimationFrame(step);
-
-  }, [end, duration, isVisible]);
-
-
-
-  return { ref, count };
-
-};
-
-
-
-// --- Components ---
-
-
-
-const PremiumBackground = () => (
-
-  <div className="fixed inset-0 z-[-1] bg-[#050505]">
-
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_10%,transparent_100%)]" />
-
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
-
-    <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+
+// --- Constants & Assets ---
+
+const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/64f0f622444e7c703f8f1066/703b7194-6d9b-4394-a792-6d2c44869503/Untitled+design+%281%29.png";
+const REPORT_FORM_URL = "https://forms.gle/MkUCRvdXBghA2HQm6";
+
+const TEAM_HIERARCHY = [
+  { 
+    id: "exec", 
+    label: "Executive Leadership", 
+    members: [
+      { name: "Boaz Acosta", role: "FOUNDER & CEO", email: "boaz@intelguard.org", telegram: "@bo_sint", isVerified: true, isFounder: true },
+      { name: "Monroe Wright", role: "COO", email: "monroe@intelguard.org" }
+    ]
+  },
+  { 
+    id: "ops", 
+    label: "Investigations", 
+    members: [
+      { name: "John Davis", role: "HEAD OF INVESTIGATIONS", email: "john@intelguard.org" },
+      { name: "Vinnie Castro", role: "SENIOR INVESTIGATOR", email: "vinnie@intelguard.org" },
+      { name: "Oliver Dudas", role: "INVESTIGATOR", email: "oliver@intelguard.org" }
+    ]
+  },
+  { 
+    id: "training", 
+    label: "Academy", 
+    members: [
+      { name: "Mason Woods", role: "INVESTIGATOR IN TRAINING", email: "Internal Assignment" }
+    ]
+  }
+];
+
+const IMPACT_STATS = [
+  { 
+    label: "Actionable Cases Closed", 
+    value: "90", 
+    suffix: "+", 
+    icon: <ShieldCheck className="w-6 h-6 text-white" /> 
+  },
+  { 
+    label: "CSAM Databases Eradicated", 
+    value: "8", 
+    suffix: "+ TB", 
+    icon: <Database className="w-6 h-6 text-white" /> 
+  }
+];
+
+const CRYPTO_WALLETS = [
+  { name: "Bitcoin", symbol: "BTC", addr: "bc1qyh5jdwqq7frw5fjdyxcgejhx79sjpm6pf3zfr3", logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg" },
+  { name: "Ethereum", symbol: "ETH", addr: "0x690B9A9E9aa1349101842367582562691a62002d", logo: "https://cryptologos.cc/logos/ethereum-eth-logo.svg" },
+  { name: "Monero", symbol: "XMR", addr: "45VSTwXcBpFNoV6oaxnL6yBbw7oRPRJ2BCmonTeSnuJQQwdnikQzQhwVcYK73ttt1Rbn2F1TQmAUJDVncXM8qj8z9PmcAaD", logo: "https://cryptologos.cc/logos/monero-xmr-logo.svg" },
+  { name: "Solana", symbol: "SOL", addr: "7vEshR7S9S9uPjRkH5K2JtJv1wV6f5m6PjRkH5K2JtJv", logo: "https://cryptologos.cc/logos/solana-sol-logo.svg" },
+  { name: "Litecoin", symbol: "LTC", addr: "LNV6oaxnL6yBbw7oRPRJ2BCmonTeSnuJQQwdnikQzQhw", logo: "https://cryptologos.cc/logos/litecoin-ltc-logo.svg" }
+];
+
+const COOPERATION_LIST = [
+  { name: "Federal Bureau of Investigation", url: "https://www.fbi.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" },
+  { name: "INTERPOL", url: "https://www.interpol.int", logo: "https://upload.wikimedia.org/wikipedia/en/e/e4/Interpol_logo.svg" },
+  { name: "EUROPOL", url: "https://www.europol.europa.eu", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Europol_logo.svg" },
+  { name: "Australian Federal Police", url: "https://www.afp.gov.au", logo: "https://upload.wikimedia.org/wikipedia/en/b/ba/Australian_Federal_Police_logo.svg" },
+  { name: "United States Secret Service", url: "https://www.secretservice.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/United_States_Secret_Service_Seal.svg" }
+];
+
+// --- Sub-Components ---
+
+const SectionHeading = ({ title, subtitle, light = false, center = false }) => (
+  <div className={`mb-16 ${center ? 'text-center' : ''}`}>
+    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4 border ${light ? 'bg-black/5 border-black/10 text-black/60' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'} text-[10px] font-black uppercase tracking-widest`}>
+      <div className={`w-1 h-1 rounded-full animate-pulse ${light ? 'bg-black' : 'bg-blue-50'}`} />
+      {subtitle}
+    </div>
+    <h2 className={`text-5xl md:text-6xl font-black tracking-tighter uppercase ${light ? 'text-black' : 'text-white'}`}>
+      {title}
+    </h2>
   </div>
-
 );
 
-
-
-const Navbar = () => {
-
-  const [scrolled, setScrolled] = useState(false);
-
-
+export default function App() {
+  const [activeView, setActiveView] = useState('home');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [copySuccess, setCopySuccess] = useState("");
+  const [hoveredTab, setHoveredTab] = useState(null);
+  
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   useEffect(() => {
-
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
-
     return () => window.removeEventListener('scroll', handleScroll);
-
   }, []);
 
-
-
-  const scrollTo = (id) => {
-
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-
+  const copyToClipboard = (text) => {
+    if (text === "Internal Assignment") return;
+    navigator.clipboard.writeText(text);
+    setCopySuccess(text);
+    setTimeout(() => setCopySuccess(""), 2000);
   };
 
-
-
-  return (
-
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrolled ? 'bg-[#050505]/80 backdrop-blur-xl border-white/10 py-4' : 'bg-transparent border-transparent py-6'}`}>
-
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-
-        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('home')}>
-
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
-
-            <Shield className="w-5 h-5 text-neutral-300 group-hover:text-white transition-colors" />
-
-          </div>
-
-          <span className="text-lg font-semibold tracking-wide text-white">INTELGUARD</span>
-
-        </div>
-
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-
-          {['mission', 'impact', 'team', 'partners', 'faq'].map((item) => (
-
-            <button key={item} onClick={() => scrollTo(item)} className="hover:text-white transition-colors capitalize tracking-wide">{item}</button>
-
-          ))}
-
-          <button 
-
-            onClick={() => scrollTo('contact')} 
-
-            className="px-5 py-2.5 bg-white text-black rounded-full hover:bg-neutral-200 hover:scale-105 transition-all duration-300 font-semibold shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-
-          >
-
-            Contact Us
-
-          </button>
-
-        </div>
-
-      </div>
-
-    </nav>
-
-  );
-
-};
-
-
-
-const SectionHeading = ({ title, subtitle, badge, align = "center" }) => {
-
-  const { ref, isVisible } = useScrollReveal();
-
-  return (
-
-    <div ref={ref} className={`mb-20 transition-all duration-1000 ease-out ${align === 'center' ? 'text-center' : 'text-left'} ${isVisible ? 'opacity-100 translate-y-0 blur-none' : 'opacity-0 translate-y-8 blur-sm'}`}>
-
-      {badge && (
-
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-neutral-200 text-xs font-bold uppercase tracking-widest mb-6">
-
-          {badge}
-
-        </div>
-
-      )}
-
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tighter text-white mb-6 leading-tight">
-
-        {title}
-
-      </h2>
-
-      {subtitle && <p className={`text-neutral-400 text-lg font-light leading-relaxed ${align === 'center' ? 'max-w-2xl mx-auto' : 'max-w-xl'}`}>{subtitle}</p>}
-
-    </div>
-
-  );
-
-};
-
-
-
-const Hero = () => {
-
-  const { ref, isVisible } = useScrollReveal();
-
-  
-
-  return (
-
-    <section id="home" className="min-h-[100svh] flex items-center justify-center pt-24 px-6 relative overflow-hidden">
-
-      <div ref={ref} className={`max-w-5xl mx-auto text-center transition-all duration-1000 ease-out delay-100 ${isVisible ? 'opacity-100 translate-y-0 blur-none' : 'opacity-0 translate-y-12 blur-md'}`}>
-
-        
-
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-300 text-sm font-medium mb-8 backdrop-blur-md hover:bg-white/10 transition-colors cursor-default">
-
-          <Lock className="w-3.5 h-3.5" /> Verified 501(c)(3) Non-Profit
-
-        </div>
-
-        
-
-        <h1 className="text-6xl md:text-8xl font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 mb-8 leading-[1.1]">
-
-          Protect the Vulnerable.<br />Track the Predators.
-
-        </h1>
-
-        
-
-        <p className="text-xl md:text-2xl text-neutral-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-
-          We deploy elite Open-Source Intelligence (OSINT) to assist global law enforcement in dismantling networks of child exploitation and human trafficking.
-
-        </p>
-
-        
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-
-          <button 
-
-            onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-
-            className="group relative px-8 py-4 w-full sm:w-auto bg-white text-black font-semibold rounded-full hover:scale-105 transition-all duration-300 overflow-hidden"
-
-          >
-
-            <span className="relative z-10 flex items-center gap-2">Report a Tip <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform"/></span>
-
-            <div className="absolute inset-0 bg-neutral-200 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-
-          </button>
-
-          <button 
-
-            onClick={() => document.getElementById('mission').scrollIntoView({ behavior: 'smooth' })}
-
-            className="px-8 py-4 w-full sm:w-auto bg-[#111] text-white font-medium rounded-full border border-white/10 hover:bg-white/5 transition-colors"
-
-          >
-
-            Our Mission
-
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const Mission = () => {
-
-  const { ref, isVisible } = useScrollReveal();
-
-  const points = [
-
-    { title: "Target Identification", desc: "Locating predators within encrypted and decentralized digital environments." },
-
-    { title: "Evidence Synthesis", desc: "Compiling forensic-grade intelligence packages for law enforcement action." },
-
-    { title: "Victim Rescue Support", desc: "Providing real-time geolocation data to help agencies intercept trafficking operations." }
-
-  ];
-
-
-
-  return (
-
-    <section id="mission" className="py-32 px-6 bg-[#0a0a0a]">
-
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-
-        <div ref={ref} className={`transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
-
-          <SectionHeading 
-
-            align="left"
-
-            badge="The Mission" 
-
-            title="Dismantling the Inhuman Economy." 
-
-            subtitle="IntelGuard was founded on a singular premise: Technology used for harm must be met with superior technology used for justice."
-
-          />
-
-          <div className="space-y-6">
-
-            {points.map((p, i) => (
-
-              <div key={i} className="flex gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/10 group hover:bg-white/[0.05] transition-all">
-
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white group-hover:bg-white/10 transition-colors">
-
-                  <Zap className="w-6 h-6" />
-
-                </div>
-
-                <div>
-
-                  <h4 className="text-white text-lg font-semibold mb-1">{p.title}</h4>
-
-                  <p className="text-neutral-400 text-sm leading-relaxed">{p.desc}</p>
-
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </div>
-
-        <div className={`relative rounded-3xl overflow-hidden aspect-square lg:aspect-video bg-neutral-900 border border-white/10 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'}`}>
-
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070')] bg-cover bg-center grayscale opacity-40 mix-blend-luminosity" />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
-
-          <div className="absolute bottom-8 left-8 right-8 p-8 backdrop-blur-xl bg-black/60 border border-white/10 rounded-2xl">
-
-            <p className="text-base text-neutral-200 font-light italic leading-relaxed">"Our goal is not just to witness these crimes, but to provide the technical keys that allow law enforcement to walk through the door."</p>
-
-            <p className="text-xs text-white/50 mt-4 uppercase tracking-[0.2em] font-bold">— IntelGuard Operational Directive</p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const Stats = () => {
-
-  const { ref: casesRef, count: casesCount } = useAnimatedNumber(90);
-
-  const { ref: dataRef, count: dataCount } = useAnimatedNumber(6.50);
-
-
-
-  const tactics = [
-
-    { icon: Search, label: "Digital Forensics", text: "Deep-web link analysis and metadata extraction." },
-
-    { icon: Globe, label: "Network Mapping", text: "Visualizing global trafficking nodes and financial funnels." },
-
-    { icon: FileText, label: "Case Generation", text: "Legal-ready documentation delivered to federal agencies." },
-
-    { icon: Activity, label: "Live Monitoring", text: "24/7 scanning of known predatory forums and channels." }
-
-  ];
-
-
-
-  return (
-
-    <section id="impact" className="py-32 px-6 relative bg-[#050505]">
-
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      <div className="max-w-7xl mx-auto">
-
-        <SectionHeading badge="Impact" title="Quantifiable Results" subtitle="Our ongoing commitment to rendering the digital world inhospitable to predators." />
-
-        
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
-
-          <div ref={casesRef} className="group relative p-12 rounded-[2.5rem] bg-white/[0.03] border border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden backdrop-blur-md">
-
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-10">
-
-              <ShieldAlert className="w-8 h-8 text-white transition-colors" />
-
-            </div>
-
-            <h3 className="text-8xl font-bold tracking-tighter text-white mb-4 flex items-baseline gap-2">
-
-              {casesCount}<span className="text-4xl text-neutral-500 font-medium">+</span>
-
-            </h3>
-
-            <p className="text-xl text-neutral-300 font-medium tracking-wide">Actionable Cases Closed</p>
-
-          </div>
-
-
-
-          <div ref={dataRef} className="group relative p-12 rounded-[2.5rem] bg-white/[0.03] border border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden backdrop-blur-md">
-
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-10">
-
-              <Database className="w-8 h-8 text-white transition-colors" />
-
-            </div>
-
-            <h3 className="text-8xl font-bold tracking-tighter text-white mb-4 flex items-baseline gap-2">
-
-              {dataCount}<span className="text-4xl text-neutral-500 font-medium">+ TB</span>
-
-            </h3>
-
-            <p className="text-xl text-neutral-300 font-medium tracking-wide">CSAM Databases Eradicated</p>
-
-          </div>
-
-        </div>
-
-
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-          {tactics.map((t, i) => (
-
-            <div key={i} className="p-8 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all hover:-translate-y-1">
-
-              <t.icon className="w-6 h-6 text-neutral-300 mb-5" />
-
-              <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-white mb-3">{t.label}</h4>
-
-              <p className="text-sm text-neutral-500 leading-relaxed">{t.text}</p>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const TeamMember = ({ name, role, email, telegram, isOwner, delay }) => {
-
-  const { ref, isVisible } = useScrollReveal();
-
-  
-
-  return (
-
-    <div 
-
-      ref={ref} 
-
-      className={`relative p-8 rounded-3xl bg-transparent border border-white/5 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-500 ease-out group ${isVisible ? 'opacity-100 translate-y-0 blur-none' : 'opacity-0 translate-y-8 blur-sm'}`}
-
-      style={{ transitionDelay: `${delay}ms` }}
-
-    >
-
-      <div className="flex flex-col h-full">
-
-        <div className="flex items-center gap-2 mb-1">
-
-          <h4 className="text-xl font-medium text-white tracking-tight">{name}</h4>
-
-          {isOwner && (
-
-            <div className="flex items-center gap-1 ml-1">
-
-              <div title="Owner" className="relative flex items-center justify-center">
-
-                <svg viewBox="0 0 24 24" className="w-5 h-5 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" fill="currentColor">
-
-                  <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z" />
-
-                </svg>
-
-              </div>
-
-              <div title="Verified Investigator" className="relative flex items-center justify-center">
-
-                <svg viewBox="0 0 24 24" className="w-4 h-4 text-blue-500" fill="currentColor">
-
-                  <path d="M22.5 12.5c0-1.58-.8-3.04-2.12-3.88.13-1.58-.35-3.2-1.42-4.27-1.07-1.07-2.69-1.55-4.27-1.42C13.84 1.62 12.38.82 10.8.82c-1.58 0-3.04.8-3.88 2.12-1.58-.13-3.2.35-4.27 1.42-1.07 1.07-1.55 2.69-1.42 4.27C.32 9.46-.48 10.92-.48 12.5c0 1.58.8 3.04 2.12 3.88-.13 1.58.35 3.2 1.42 4.27 1.07 1.07 2.69 1.55 4.27 1.42 1.15 1.15 2.61 1.95 4.19 1.95s3.04-.8 3.88-2.12c1.58.13 3.2-.35 4.27-1.42 1.07-1.07 1.55-2.69 1.42-4.27 1.32-.84 2.12-2.3 2.12-3.88zm-11.5 5l-4.5-4.5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z" />
-
-                </svg>
-
-              </div>
-
-            </div>
-
-          )}
-
-        </div>
-
-        <p className="text-neutral-500 text-sm font-medium tracking-wide uppercase mb-6">{role}</p>
-
-        
-
-        <div className="mt-auto pt-6 border-t border-white/5 group-hover:border-white/10 transition-colors flex flex-col gap-3">
-
-          {email && (
-
-            <a href={`mailto:${email}`} className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors font-mono">
-
-              {email} <ExternalLink className="w-3 h-3 opacity-50" />
-
-            </a>
-
-          )}
-
-          {telegram && (
-
-            <a href={telegram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#26A5E4] transition-colors font-mono">
-
-              <Send className="w-3.5 h-3.5" /> @bo_sint
-
-            </a>
-
-          )}
-
-          {!email && !telegram && (
-
-            <span className="text-sm text-neutral-600 font-mono italic">Internal Assignment</span>
-
-          )}
-
-        </div>
-
-      </div>
-
-    </div>
-
-  );
-
-};
-
-
-
-const Team = () => {
-
-  const team = [
-
-    { name: "Boaz Acosta", role: "Founder & CEO", email: "boaz@intelguard.org", telegram: "https://t.me/bo_sint", isOwner: true },
-
-    { name: "Monroe Wright", role: "COO", email: "monroe@intelguard.org" },
-
-    { name: "John Davis", role: "Head of Investigations", email: "john@intelguard.org" },
-
-    { name: "Vinnie Castro", role: "Senior Investigator", email: "vinnie@intelguard.org" },
-
-    { name: "Oliver Dudas", role: "Investigator", email: "oliver@intelguard.org" },
-
-    { name: "Mason Woods", role: "Investigator in Training", email: null },
-
-  ];
-
-
-
-  return (
-
-    <section id="team" className="py-32 px-6">
-
-      <div className="max-w-7xl mx-auto">
-
-        <SectionHeading badge="Leadership" title="The Intelligence Unit" subtitle="Specialized operators bridging the gap between open-source data and law enforcement action." />
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-          {team.map((member, i) => (
-
-            <TeamMember key={i} {...member} delay={i * 100} />
-
-          ))}
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const Marquee = ({ items, reverse = false, speed = "40s" }) => {
-
-  return (
-
-    <div className="relative flex overflow-hidden w-full py-10 [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-
-      <div className={`flex min-w-full shrink-0 items-center justify-around gap-16 px-8 ${reverse ? 'animate-marquee-reverse' : 'animate-marquee'}`} style={{ animationDuration: speed }}>
-
-        {items.map((item, i) => (
-
-          <a key={i} href={item.link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center gap-1 group transition-transform hover:scale-105 active:scale-95">
-
-            <span className="text-2xl md:text-3xl font-bold tracking-tighter text-neutral-600 group-hover:text-white transition-colors duration-500 uppercase whitespace-nowrap">{item.name}</span>
-
-            {item.url && <span className="text-[10px] font-mono tracking-widest text-neutral-700 group-hover:text-neutral-400 transition-colors uppercase">{item.url}</span>}
-
-          </a>
-
-        ))}
-
-      </div>
-
-      <div aria-hidden="true" className={`flex min-w-full shrink-0 items-center justify-around gap-16 px-8 ${reverse ? 'animate-marquee-reverse' : 'animate-marquee'}`} style={{ animationDuration: speed }}>
-
-        {items.map((item, i) => (
-
-          <a key={i} href={item.link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center gap-1 group transition-transform hover:scale-105 active:scale-95">
-
-            <span className="text-2xl md:text-3xl font-bold tracking-tighter text-neutral-600 group-hover:text-white transition-colors duration-500 uppercase whitespace-nowrap">{item.name}</span>
-
-            {item.url && <span className="text-[10px] font-mono tracking-widest text-neutral-700 group-hover:text-neutral-400 transition-colors uppercase">{item.url}</span>}
-
-          </a>
-
-        ))}
-
-      </div>
-
-    </div>
-
-  );
-
-};
-
-
-
-const Partners = () => {
-
-  const osintPartners = [
-
-    { name: "Nosint", url: "nosint.org", link: "https://nosint.org" },
-
-    { name: "OSINT Industries", url: "osint.industries", link: "https://osint.industries" },
-
-    { name: "Hudson Rock", url: "hudsonrock.com", link: "https://hudsonrock.com" },
-
-    { name: "Cypher Dynamics", url: "cypherdynamics.com", link: "https://cypherdynamics.com" },
-
-    { name: "Proximity OSINT", url: "proximityosint.com", link: "https://proximityosint.com" },
-
-    { name: "BreachHub", url: "breachhub.org", link: "https://breachhub.org" },
-
-  ];
-
-
-
-  const agencies = [
-
-    { name: "INTERPOL", url: "interpol.int", link: "https://www.interpol.int" },
-
-    { name: "EUROPOL", url: "europol.europa.eu", link: "https://www.europol.europa.eu" },
-
-    { name: "FBI", url: "fbi.gov", link: "https://www.fbi.gov" },
-
-    { name: "NCMEC", url: "missingkids.org", link: "https://www.missingkids.org" },
-
-    { name: "IWF", url: "iwf.org.uk", link: "https://www.iwf.org.uk" },
-
-    { name: "Romanian Police", url: "politiaromana.ro", link: "https://www.politiaromana.ro" },
-
-    { name: "Columbian Police", url: "policia.gov.co", link: "https://www.policia.gov.co" },
-
-    { name: "City of London Police", url: "cityoflondon.police.uk", link: "https://www.cityoflondon.police.uk" },
-
-    { name: "Dorset Police", url: "dorset.police.uk", link: "https://www.dorset.police.uk" },
-
-    { name: "Ministry of Interior", url: "interieur.gouv.fr", link: "https://www.interieur.gouv.fr" },
-
-    { name: "Australian Fed Police", url: "afp.gov.au", link: "https://www.afp.gov.au" },
-
-    { name: "Dallas Police", url: "dallaspolice.net", link: "https://www.dallaspolice.net" },
-
-    { name: "Santa Rosa Police", url: "srcity.org", link: "https://www.srcity.org" },
-
-    { name: "Torrance Police", url: "torranceca.gov", link: "https://www.torranceca.gov" },
-
-  ];
-
-
-
-  return (
-
-    <section id="partners" className="py-32 bg-[#080808] border-y border-white/5">
-
-      <SectionHeading badge="Network" title="Global Infrastructure" subtitle="Operating in tandem with premier OSINT developers and international law enforcement agencies. Click any partner to visit." />
-
-      
-
-      <div className="flex flex-col gap-12">
-
-        <div>
-
-          <div className="flex items-center gap-4 max-w-7xl mx-auto px-6 mb-2 opacity-50">
-
-            <div className="h-px bg-white/20 flex-1"></div>
-
-            <span className="text-[10px] font-bold tracking-[0.2em] text-white uppercase">Technology Partners</span>
-
-            <div className="h-px bg-white/20 flex-1"></div>
-
-          </div>
-
-          <Marquee items={osintPartners} speed="35s" />
-
-        </div>
-
-
-
-        <div>
-
-           <div className="flex items-center gap-4 max-w-7xl mx-auto px-6 mb-2 opacity-50">
-
-            <div className="h-px bg-white/20 flex-1"></div>
-
-            <span className="text-[10px] font-bold tracking-[0.2em] text-white uppercase">Agency Integrations</span>
-
-            <div className="h-px bg-white/20 flex-1"></div>
-
-          </div>
-
-          <Marquee items={agencies} reverse={true} speed="60s" />
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const FAQItem = ({ question, answer }) => {
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  
-
-  return (
-
-    <div className="border-b border-white/5 last:border-0">
-
-      <button 
-
-        className="w-full py-8 flex items-center justify-between text-left focus:outline-none group"
-
-        onClick={() => setIsOpen(!isOpen)}
-
-      >
-
-        <span className="text-lg font-medium text-neutral-300 group-hover:text-white transition-colors pr-8">{question}</span>
-
-        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-white text-black rotate-180' : 'text-neutral-500 group-hover:border-white/30'}`}>
-
-          <ChevronDown className="w-4 h-4" />
-
-        </div>
-
-      </button>
-
-      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 opacity-100 pb-8' : 'max-h-0 opacity-0'}`}>
-
-        <p className="text-neutral-400 leading-relaxed font-light pl-4 border-l border-white/10">{answer}</p>
-
-      </div>
-
-    </div>
-
-  );
-
-};
-
-
-
-const FAQ = () => {
-
-  const faqs = [
-
-    {
-
-      question: "Is IntelGuard a verified 501(c)(3) non-profit?",
-
-      answer: "Yes. IntelGuard is a fully verified 501(c)(3) non-profit organization operating strictly for charitable and educational purposes. All donations are tax-deductible under federal guidelines."
-
-    },
-
-    {
-
-      question: "What exactly does IntelGuard investigate?",
-
-      answer: "Our mandate focuses on the distribution of Child Sexual Abuse Material (CSAM), severe child exploitation, organized extortion/sextortion networks, and digital footprints of human trafficking rings. We utilize advanced OSINT to package data into actionable intelligence."
-
-    },
-
-    {
-
-      question: "Are you a law enforcement agency?",
-
-      answer: "No, we are a civilian intelligence non-profit. We do not have arrest authority. Our role is to act as a highly specialized intelligence-gathering bridge, providing meticulously documented case files directly to sworn authorities globally."
-
-    },
-
-    {
-
-      question: "How do you partner with OSINT software tools?",
-
-      answer: "We establish strategic partnerships with OSINT developers to utilize their software in live investigations. In exchange, we provide high-value feedback and real-world performance metrics. Developers interested in deploying their tools for good can reach out to our general contact channel."
-
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id.toLowerCase());
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
-
-  ];
-
-
-
-  return (
-
-    <section id="faq" className="py-32 px-6 max-w-4xl mx-auto">
-
-      <SectionHeading badge="Information" title="Operating Parameters" />
-
-      <div className="bg-white/[0.02] backdrop-blur-sm px-8 rounded-3xl border border-white/10">
-
-        {faqs.map((faq, i) => <FAQItem key={i} {...faq} />)}
-
-      </div>
-
-    </section>
-
-  );
-
-};
-
-
-
-const Contact = () => {
-
-  const { ref, isVisible } = useScrollReveal();
-
-  
-
-  return (
-
-    <section id="contact" className="py-32 px-6 relative">
-
-      <div className="max-w-6xl mx-auto">
-
-        <SectionHeading badge="Comms" title="Secure Channels" subtitle="Select the appropriate routing channel to ensure immediate handling of your transmission." />
-
-        
-
-        <div ref={ref} className={`grid lg:grid-cols-3 gap-6 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 blur-none' : 'opacity-0 translate-y-12 blur-sm'}`}>
-
-          
-
-          {/* Tipline Card - RED */}
-
-          <div className="group relative p-10 rounded-[2rem] bg-[#0a0a0a] border border-white/5 hover:border-red-500/30 transition-all duration-500 overflow-hidden flex flex-col h-full shadow-[0_0_40px_rgba(239,68,68,0.02)]">
-
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-80 group-hover:h-[3px] transition-all" />
-
-            <div className="absolute inset-0 bg-gradient-to-b from-red-500/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            
-
-            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-
-            </div>
-
-            <h3 className="text-2xl font-medium text-white mb-3">Intelligence Tip</h3>
-
-            <p className="text-neutral-500 text-sm mb-8 leading-relaxed font-light flex-grow">To securely report CSAM, child exploitation networks, or targeted extortion campaigns.</p>
-
-            
-
-            <a href="mailto:tipline@intelguard.org" className="inline-flex items-center gap-2 text-white font-mono text-sm hover:text-red-400 transition-colors pt-6 border-t border-white/5">
-
-              tipline@intelguard.org <ExternalLink className="w-3 h-3" />
-
-            </a>
-
-          </div>
-
-
-
-          {/* General Card - GREY */}
-
-          <div className="group relative p-10 rounded-[2rem] bg-[#0a0a0a] border border-white/5 hover:border-neutral-500/30 transition-all duration-500 overflow-hidden flex flex-col h-full">
-
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-neutral-400 to-transparent opacity-80 group-hover:h-[3px] transition-all" />
-
-            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            
-
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-8">
-
-              <Mail className="w-5 h-5 text-neutral-300" />
-
-            </div>
-
-            <h3 className="text-2xl font-medium text-white mb-3">General Inquiry</h3>
-
-            <p className="text-neutral-500 text-sm mb-8 leading-relaxed font-light flex-grow">For press inquiries, general communications, or OSINT developers wishing to integrate.</p>
-
-            
-
-            <a href="mailto:contact@intelguard.org" className="inline-flex items-center gap-2 text-white font-mono text-sm hover:text-neutral-400 transition-colors pt-6 border-t border-white/5">
-
-              contact@intelguard.org <ExternalLink className="w-3 h-3" />
-
-            </a>
-
-          </div>
-
-
-
-          {/* LEER Card - BLUE */}
-
-          <div className="group relative p-10 rounded-[2rem] bg-[#0a0a0a] border border-white/5 hover:border-blue-500/30 transition-all duration-500 overflow-hidden flex flex-col h-full shadow-[0_0_40px_rgba(59,130,246,0.02)]">
-
-            {/* Restricted Shield Watermark */}
-
-            <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-700 pointer-events-none">
-
-              <Shield className="w-64 h-64 text-blue-500" />
-
-            </div>
-
-            
-
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80 group-hover:h-[3px] transition-all" />
-
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            
-
-            <div className="flex items-start justify-between mb-8">
-
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-
-                <Lock className="w-5 h-5 text-blue-500" />
-
+  };
+
+  const navTabs = ['Cooperation', 'Impact', 'Donate'];
+
+  const renderContent = () => {
+    switch(activeView) {
+      case 'report':
+        return (
+          <section className="pt-32 pb-48 bg-[#FDFDFD] text-black min-h-screen">
+            <div className="max-w-7xl mx-auto px-6">
+              <SectionHeading title="Intelligence Intake" subtitle="Report a Case" light />
+              
+              <div className="grid lg:grid-cols-3 gap-8 mb-20">
+                <div className="lg:col-span-2 space-y-12">
+                  <div className="p-10 bg-white border border-black/5 rounded-[40px] shadow-sm">
+                    <h3 className="text-3xl font-black uppercase mb-8 flex items-center gap-4">
+                      <ShieldAlert className="w-8 h-8 text-red-600" />
+                      Our Investigative Scope
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-8 text-gray-500 font-medium">
+                      <div className="space-y-4">
+                        <div className="flex gap-4">
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />
+                          <p>CSAM Distribution & Hosting Networks</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />
+                          <p>Targeted Cyber-Stalking & Harassment</p>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex gap-4">
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />
+                          <p>Non-Consensual Image Distribution (NCII)</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />
+                          <p>Advanced OSINT for Fugitive Locating</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="p-8 bg-blue-50 border border-blue-100 rounded-[32px]">
+                      <Clock className="w-8 h-8 text-blue-600 mb-6" />
+                      <h4 className="text-lg font-black uppercase mb-2">Response Times</h4>
+                      <p className="text-sm text-gray-500 leading-relaxed font-medium">
+                        Emergency cases are reviewed within 12-24 hours. Standard OSINT intelligence requests are processed within 3-5 business days.
+                      </p>
+                    </div>
+                    <div className="p-8 bg-black rounded-[32px] text-white">
+                      <Lock className="w-8 h-8 text-blue-400 mb-6" />
+                      <h4 className="text-lg font-black uppercase mb-2">Anonymity Guaranteed</h4>
+                      <p className="text-sm text-white/60 leading-relaxed font-medium">
+                        Your data is encrypted. We do not store PII for tipsters unless explicitly required for legal testimony.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-10 border-2 border-dashed border-black/10 rounded-[40px]">
+                    <h4 className="text-xl font-black uppercase mb-4">Submission Guidelines</h4>
+                    <ul className="space-y-3 text-sm text-gray-500 font-medium">
+                      <li className="flex gap-3 items-start">• Include direct URLs to the infringing material whenever possible.</li>
+                      <li className="flex gap-3 items-start">• Attach screenshots of metadata or IP headers if available.</li>
+                      <li className="flex gap-3 items-start">• Do not engage with the target after reporting to IntelGuard.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-1">
+                  <div className="sticky top-32 p-10 bg-white border border-black/5 shadow-2xl rounded-[48px] text-center">
+                    <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-600/20">
+                      <MessageSquareWarning className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-black uppercase mb-4">Ready to Report?</h3>
+                    <p className="text-sm text-gray-500 font-medium mb-10 leading-relaxed">
+                      You will be redirected to our secure intake portal hosted on encrypted infrastructure.
+                    </p>
+                    <a 
+                      href={REPORT_FORM_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full py-6 bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-blue-600 transition-all flex items-center justify-center gap-3 group"
+                    >
+                      Open Official Tip Form
+                      <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    </a>
+                    <p className="mt-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      IntelGuard Secure Protocol V4.2
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
-
-                <ShieldCheck className="w-3 h-3 text-blue-400" />
-
-                <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400">Restricted Access</span>
-
-              </div>
-
+              <button onClick={() => setActiveView('home')} className="inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-blue-500 hover:text-black transition-colors">
+                <ArrowRight className="rotate-180 w-4 h-4" /> Return to IntelGuard Hub
+              </button>
             </div>
+          </section>
+        );
+      case 'team':
+        return (
+          <section className="pt-32 pb-48 bg-[#050505] text-white min-h-screen">
+            <div className="max-w-7xl mx-auto px-6">
+              <SectionHeading title="Personnel" subtitle="Verified Investigative Chain" />
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {TEAM_HIERARCHY.flatMap(s => s.members).map((member, i) => (
+                  <div key={i} className="p-8 bg-[#0A0A0A] border border-white/5 rounded-[24px] hover:border-blue-600/40 transition-all flex flex-col justify-between group h-64">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold tracking-tight">{member.name}</h3>
+                          {member.isFounder && <Crown className="w-4 h-4 text-blue-500" />}
+                          {member.isVerified && <Verified className="w-4 h-4 text-blue-500" />}
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-8">{member.role}</div>
+                    </div>
+                    
+                    <div className="pt-6 border-t border-white/5 space-y-3">
+                      <div onClick={() => copyToClipboard(member.email)} className={`flex items-center justify-between text-sm text-gray-400 hover:text-white cursor-pointer transition-colors ${member.email === "Internal Assignment" ? "italic opacity-20 pointer-events-none" : ""}`}>
+                        <span className="truncate text-xs">{member.email}</span>
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                      </div>
+                      {member.telegram && (
+                        <div onClick={() => copyToClipboard(member.telegram)} className="flex items-center gap-2 text-xs text-gray-400 hover:text-blue-500 cursor-pointer transition-colors">
+                          <Send className="w-3 h-3" /> <span>{member.telegram}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setActiveView('home')} className="mt-12 inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-blue-500 hover:text-white transition-colors">
+                <ArrowRight className="rotate-180 w-4 h-4" /> Back to Terminal
+              </button>
+            </div>
+          </section>
+        );
+      case 'removals':
+        return (
+          <section className="py-48 bg-white text-black min-h-screen">
+            <div className="max-w-7xl mx-auto px-6">
+              <SectionHeading title="Data Integrity" subtitle="Protocol: Redaction & Removal" light />
+              <div className="grid lg:grid-cols-2 gap-20 items-center">
+                <div>
+                  <p className="text-xl text-gray-500 font-medium leading-relaxed mb-10">
+                    IntelGuard operates a high-priority data removal protocol for survivors of digital exploitation. We work directly with platforms and databases to redact harmful PII.
+                  </p>
+                  <div className="flex flex-col gap-6">
+                    <div className="flex gap-4 p-6 bg-black/5 rounded-3xl border border-transparent hover:border-blue-600 transition-all">
+                      <Trash2 className="w-10 h-10 text-red-500 shrink-0" />
+                      <div>
+                        <h4 className="text-lg font-black uppercase mb-1">Redaction Requests</h4>
+                        <p className="text-sm text-gray-500">Fast-track removal of leaked images, videos, and residential information.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4 p-6 bg-black/5 rounded-3xl border border-transparent hover:border-blue-600 transition-all">
+                      <Globe className="w-10 h-10 text-blue-500 shrink-0" />
+                      <div>
+                        <h4 className="text-lg font-black uppercase mb-1">Crawler De-indexing</h4>
+                        <p className="text-sm text-gray-500">Removal of cached results from major search engines and archive sites.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-12 bg-black rounded-[40px] text-white">
+                  <h3 className="text-3xl font-black uppercase mb-6 tracking-tighter">Submit Removal Claim</h3>
+                  <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                    <input type="email" placeholder="YOUR EMAIL" className="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest focus:border-blue-500 outline-none" />
+                    <textarea placeholder="DESCRIPTION OF DATA & LINKS" rows="4" className="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest focus:border-blue-500 outline-none resize-none"></textarea>
+                    <button className="w-full py-5 bg-blue-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-blue-700 transition-all">Execute Redaction Request</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      default:
+        return (
+          <>
+            {/* Hero Section */}
+            <section className="relative pt-48 pb-32 lg:pt-64 lg:pb-48 bg-white overflow-hidden">
+              <div className="absolute top-0 right-0 w-1/2 h-full bg-[#050505] hidden lg:block skew-x-[-12deg] translate-x-20" />
+              <div className="max-w-7xl mx-auto px-6 relative z-10">
+                <div className="grid lg:grid-cols-2 gap-20 items-center">
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
+                      <Activity className="w-3 h-3 animate-pulse" />
+                      Civilian Investigative Unit
+                    </div>
+                    <h1 className="text-7xl md:text-8xl font-black leading-[0.9] tracking-tighter text-black mb-8 uppercase">
+                      Securing <br />
+                      <span className="text-blue-600">Digital</span> Frontiers.
+                    </h1>
+                    <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg mb-10">
+                      A strategic non-profit dedicated to dismantling exploitation networks through official OSINT and high-level agency cooperation.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <button onClick={() => setActiveView('report')} className="px-10 py-5 bg-black text-white font-black uppercase tracking-widest text-xs rounded-full hover:bg-blue-600 transition-all flex items-center group shadow-xl hover:shadow-blue-500/20">
+                        <BadgeAlert className="w-5 h-5 mr-3" /> Report Abuse Case
+                      </button>
+                      <button onClick={() => setActiveView('team')} className="px-10 py-5 border border-black/10 text-black font-black uppercase tracking-widest text-xs rounded-full hover:bg-blue-50 transition-all flex items-center">
+                        Explore Personnel
+                      </button>
+                    </div>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="hidden lg:block relative">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-600/20 blur-[100px] rounded-full" />
+                    <div className="bg-white/5 backdrop-blur-2xl p-16 rounded-[40px] border border-white/10 shadow-2xl text-center relative z-10">
+                      <div className="w-48 h-48 bg-white rounded-3xl shadow-2xl flex items-center justify-center mb-8 mx-auto overflow-hidden p-2">
+                        <img src={LOGO_URL} alt="IntelGuard Logo" className="w-full h-full object-contain" />
+                      </div>
+                      <h3 className="text-white text-3xl font-black uppercase mb-4 tracking-tighter">Verified Network</h3>
+                      <p className="text-white/60 text-sm mb-8">Authoritative intelligence bridging civilian effort with global enforcement.</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                          <div key={i} className="h-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                            <Fingerprint className="w-5 h-5 text-blue-400 opacity-40" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </section>
 
-            
+            {/* Impact Section */}
+            <section id="impact" className="py-32 bg-[#050505]">
+              <div className="max-w-7xl mx-auto px-6">
+                <SectionHeading title="Quantifiable Results" subtitle="Impact" center />
+                <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                  {IMPACT_STATS.map((stat, i) => (
+                    <div key={i} className="bg-[#0A0A0A] border border-white/5 rounded-[40px] p-12 transition-all hover:bg-white group">
+                      <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-12 group-hover:bg-black transition-colors">
+                        {stat.icon}
+                      </div>
+                      <div className="flex items-baseline gap-1 mb-4">
+                        <span className="text-8xl font-black tracking-tighter text-white group-hover:text-black transition-colors">
+                          {stat.value}
+                        </span>
+                        <span className="text-4xl font-black text-gray-500 group-hover:text-black/40 transition-colors uppercase">
+                          {stat.suffix}
+                        </span>
+                      </div>
+                      <p className="text-lg font-bold text-gray-400 group-hover:text-black/60 transition-colors uppercase tracking-tight">
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-            <h3 className="text-2xl font-medium text-white mb-3 relative z-10">L.E.E.R. Portal</h3>
+            {/* Cooperation Ribbon */}
+            <section id="cooperation" className="py-24 bg-white border-y border-black/5">
+              <div className="flex overflow-hidden whitespace-nowrap relative">
+                <div className="flex animate-marquee items-center">
+                  {[...COOPERATION_LIST, ...COOPERATION_LIST].map((agency, i) => (
+                    <a key={i} href={agency.url} target="_blank" className="mx-12 group flex items-center gap-6">
+                      <img src={agency.logo} alt={agency.name} className="h-12 w-auto grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all" />
+                      <span className="text-lg font-black tracking-tighter text-black/20 group-hover:text-black uppercase">{agency.name}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-            <p className="text-neutral-500 text-sm mb-8 leading-relaxed font-light flex-grow relative z-10">
+            {/* Donate Section */}
+            <section id="donate" className="py-32 bg-black text-white">
+              <div className="max-w-7xl mx-auto px-6">
+                <SectionHeading title="Fund Mission" subtitle="Operational Funding" />
+                <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {CRYPTO_WALLETS.map((c, i) => (
+                    <div key={i} onClick={() => copyToClipboard(c.addr)} className="group p-8 bg-white/5 border border-white/5 rounded-[40px] cursor-pointer hover:bg-white hover:text-black transition-all">
+                      <div className="flex justify-between items-center mb-8">
+                        <img src={c.logo} alt={c.name} className="h-10 w-10 group-hover:grayscale transition-all" />
+                        {copySuccess === c.addr ? <CheckCircle2 className="text-green-500" /> : <Copy className="text-gray-500" />}
+                      </div>
+                      <h4 className="text-xl font-black uppercase mb-1">{c.name}</h4>
+                      <div className="text-[9px] font-mono break-all opacity-40 group-hover:opacity-100">{c.addr}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        );
+    }
+  };
 
-              <span className="text-blue-400/80 font-bold block mb-1">Law Enforcement Only.</span>
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A] font-sans selection:bg-blue-500 selection:text-white overflow-x-hidden scroll-smooth">
+      
+      <motion.div className="fixed top-0 left-0 right-0 h-1.5 bg-blue-600 origin-left z-[100]" style={{ scaleX }} />
 
-              Secure access for sworn law enforcement and federal agents. Request case data or CM credentials.
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled || activeView !== 'home' ? 'bg-white/90 backdrop-blur-xl border-b border-black/5 py-4' : 'bg-transparent py-8'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveView('home')}>
+            <div className="relative w-12 h-12 bg-black rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-500 overflow-hidden p-1">
+              <img src={LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <span className="text-xl font-black tracking-tighter uppercase">
+              Intel<span className="text-blue-600">Guard</span>
+            </span>
+          </div>
 
-            </p>
-
-            
-
-<a href="mailto:leer@intelguard.org" className="inline-flex items-center justify-between text-white font-mono text-sm hover:text-blue-400 transition-colors pt-6 border-t border-white/5 relative z-10">
-              <span>leer@intelguard.org</span>
-              <span className="flex items-center gap-1 text-[10px] text-blue-400/50">
-                Secure Channel <ShieldCheck className="w-3 h-3" />
-              </span>
-            </a>
+          <div className="hidden md:flex items-center bg-black/5 rounded-full px-2 py-1.5 relative">
+            {navTabs.map((item) => (
+              <button 
+                key={item} 
+                onMouseEnter={() => setHoveredTab(item)}
+                onMouseLeave={() => setHoveredTab(null)}
+                onClick={(e) => { 
+                  if (activeView !== 'home') {
+                    setActiveView('home');
+                    setTimeout(() => scrollToSection(item), 100);
+                  } else {
+                    scrollToSection(item);
+                  }
+                }} 
+                className="relative z-10 px-6 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-black/40 hover:text-black transition-colors duration-300"
+              >
+                {item}
+                {hoveredTab === item && (
+                  <motion.div 
+                    layoutId="gooey-nav"
+                    className="absolute inset-0 bg-white shadow-sm border border-black/5 rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+              </button>
+            ))}
+            <div className="w-[1px] h-4 bg-black/10 mx-2" />
+            <button 
+              onClick={() => setActiveView('team')} 
+              className={`px-6 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all active:scale-95 ${activeView === 'team' ? 'bg-blue-600 text-white' : 'text-black hover:text-blue-600'}`}
+            >
+              The Team
+            </button>
           </div>
         </div>
-      </div>
-    </section>
-  );
-};
+      </nav>
 
-// --- Main App Export ---
+      <main>
+        {renderContent()}
+      </main>
 
-export default function App() {
-  return (
-    <div className="relative min-h-screen">
-      <PremiumBackground />
-      <Navbar />
-      <Hero />
-      <Mission />
-      <Stats />
-      <Team />
-      <Partners />
-      <FAQ />
-      <Contact />
-      
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/5 text-center">
-        <p className="text-neutral-600 text-xs tracking-widest uppercase font-bold">
-          &copy; 2026 IntelGuard Intelligence Group. All Rights Reserved.
-        </p>
+      <footer className="py-24 bg-white border-t border-black/5">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-12 mb-20">
+            <div>
+              <div className="flex items-center gap-3 mb-6" onClick={() => setActiveView('home')}>
+                 <div className="w-10 h-10 overflow-hidden rounded-lg">
+                   <img src={LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
+                 </div>
+                 <span className="text-xl font-black uppercase tracking-tighter">IntelGuard</span>
+              </div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
+                Strategic civilian vanguard against digital exploitation.
+              </p>
+            </div>
+            
+            <div>
+              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-8">Communications</div>
+              <div className="space-y-4">
+                <a href="https://t.me/IntelGuard" target="_blank" className="flex items-center gap-3 group text-xs font-black uppercase tracking-widest">
+                  <Send className="w-4 h-4 text-blue-500" /> Official Channel
+                </a>
+                <a href="mailto:contact@intelguard.org" className="flex items-center gap-3 group text-xs font-black uppercase tracking-widest">
+                  <Mail className="w-4 h-4 text-blue-500" /> contact@intelguard.org
+                </a>
+                <a href="mailto:tipline@intelguard.org" className="flex items-center gap-3 group text-xs font-black uppercase tracking-widest">
+                  <Mail className="w-4 h-4 text-red-500" /> tipline@intelguard.org
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-8">Law Enforcement</div>
+              <div className="space-y-4">
+                <a href="mailto:leer@intelguard.org" className="flex items-center gap-3 group text-xs font-black uppercase tracking-widest">
+                  <Briefcase className="w-4 h-4 text-gray-600" /> leer@intelguard.org
+                </a>
+              </div>
+            </div>
+
+            <div>
+                 <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-6">Organization</div>
+                 <div className="flex flex-col gap-3">
+                   <button onClick={() => setActiveView('team')} className="text-left text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-blue-600">Personnel</button>
+                   <button onClick={() => setActiveView('removals')} className="text-left text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-blue-600">Redactions</button>
+                 </div>
+            </div>
+          </div>
+
+          <div className="pt-12 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-8">
+            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">V11.4 Precision Engine</span>
+            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">© {new Date().getFullYear()} IntelGuard Organization</span>
+          </div>
+        </div>
       </footer>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee { animation: marquee 60s linear infinite; }
+        
+        /* Global Smooth Scroll */
+        html { 
+          scroll-behavior: smooth; 
+        }
+
+        /* Better scrollbar for a premium look */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #333;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      `}} />
     </div>
   );
 }
