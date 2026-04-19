@@ -35,46 +35,45 @@ const LogoSVG = ({ className = "w-10 h-10" }) => (
 
 // --- Official Network Data ---
 const PARTNERS = [
-  { name: "nOSINT", domain: "nosint.org", logo: "https://i.postimg.cc/XYQmTCPS/photo-2026-01-24-03-28-02.jpg" },
-  { name: "OSINTLeak", domain: "osintleak.com", logo: "https://logo.clearbit.com/osintleak.com" },
-  { name: "OSINT Industries", domain: "osint.industries", logo: "https://logo.clearbit.com/osint.industries" },
-  { name: "SEON", domain: "seon.io", logo: "https://logo.clearbit.com/seon.io" },
+  { name: "nOSINT", domain: "nosint.org", logo: "https://i.postimg.cc/W1kqyGz0/Screenshot-2026-04-18-220750.png" },
+  { name: "OSINTLeak", domain: "osintleak.com", logo: "https://i.postimg.cc/NjJCNwyf/logo-300x300.webp" },
+  { name: "OSINT Industries", domain: "osint.industries", logo: "https://i.postimg.cc/3xc9XC6p/apple-touch-icon.png" },
+  { name: "SEON", domain: "seon.io", logo: "https://i.postimg.cc/Twqr4rkK/Screenshot-2026-04-18-220511.png" },
   { name: "BreachHub", domain: "breachhub.org", logo: "https://logo.clearbit.com/breachhub.org" }
 ];
 
 const INTL_AGENCIES = [
-  { name: "INTERPOL", domain: "interpol.int", logo: "https://upload.wikimedia.org/wikipedia/en/e/e4/Interpol_logo.svg" },
-  { name: "ROMANIAN POLICE", domain: "politiaromana.ro", logo: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Poli%C8%9Bia_Rom%C3%A2n%C4%83.svg" },
-  { name: "AUSTRALIAN FEDERAL POLICE", domain: "afp.gov.au", logo: "https://upload.wikimedia.org/wikipedia/en/b/ba/Australian_Federal_Police_logo.svg" },
-  { name: "CITY OF LONDON POLICE", domain: "cityoflondon.police.uk", logo: "https://upload.wikimedia.org/wikipedia/en/f/f5/City_of_London_Police_logo.svg" },
-  { name: "NIGERIA POLICE FORCE", domain: "nccc.npf.gov.ng", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Nigeria_Police_logo.svg" },
-  { name: "DORSET POLICE", domain: "dorset.police.uk", logo: "https://logo.clearbit.com/dorset.police.uk" },
-  { name: "MINISTRY OF INTERIOR", domain: "interieur.gouv.fr", logo: "https://upload.wikimedia.org/wikipedia/en/2/22/Logo_of_the_Ministry_of_the_Interior_%28France%29.svg" },
-  { name: "EUROPOL", domain: "europol.europa.eu", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Europol_logo.svg" }
+  { name: "INTERPOL", domain: "interpol.int", logo: "https://i.postimg.cc/vmXY2Tr4/3d345c24d0ccbc97935447d0858e4564.png" },
+  { name: "ROMANIAN POLICE", domain: "politiaromana.ro", logo: "https://i.postimg.cc/fTxJjwry/stema-igpr.webp" },
+  { name: "AUSTRALIAN FEDERAL POLICE", domain: "afp.gov.au", logo: "https://i.postimg.cc/xCJdkYmY/c9979a4ad844989502a5058f378b1f90.webp" },
+  { name: "CITY OF LONDON POLICE", domain: "cityoflondon.police.uk", logo: "https://i.postimg.cc/3rGRY87s/51gq-Boh-Nk-L.webp" },
+  { name: "NIGERIA POLICE FORCE", domain: "nccc.npf.gov.ng", logo: "https://i.postimg.cc/8zZktsBp/35a4380a0419fab6fabee8478e0406fc.webp" },
+  { name: "DORSET POLICE", domain: "dorset.police.uk", logo: "https://i.postimg.cc/zvw8WfGb/dorset-police-cr-pin.webp" },
+  { name: "MINISTRY OF INTERIOR", domain: "interieur.gouv.fr", logo: "https://i.postimg.cc/kggq6q3B/22643d5632575a2b3bacac629ed54900.webp" },
+  { name: "EUROPOL", domain: "europol.europa.eu", logo: "https://i.postimg.cc/tgLjM61j/514cebaef8f2414b7fabf643d05a5ce7.webp" }
 ];
 
 const DOMESTIC_AGENCIES = [
   { name: "FBI", domain: "fbi.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" },
-  { name: "DALLAS PD", domain: "dallaspolice.net", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Dallas_Police_Department_Badge.png" },
+  { name: "DALLAS PD", domain: "dallaspolice.net", logo: "https://i.postimg.cc/Wz7czf5g/bb8a5a2b92598d6ee44249c146620623.webp" },
   { name: "USSS", domain: "secretservice.gov", logo: "https://i.postimg.cc/yY9V4vm2/Logo-of-the-United-States-Secret-Service.png" },
-  { name: "TORRANCE PD", domain: "torranceca.gov", logo: "https://logo.clearbit.com/torranceca.gov" },
-  { name: "ICAC", domain: "icactaskforce.org", logo: "https://logo.clearbit.com/icactaskforce.org" },
-  { name: "NCMEC", domain: "missingkids.org", logo: "https://upload.wikimedia.org/wikipedia/en/d/da/NCMEC_logo.png" },
+  { name: "TORRANCE PD", domain: "torranceca.gov", logo: "https://i.postimg.cc/hj9HZ5Wk/Screenshot-2026-04-18-222122.png" },
+  { name: "ICAC", domain: "icactaskforce.org", logo: "https://i.postimg.cc/y6yMFtTF/favicon.png" },
+  { name: "NCMEC", domain: "missingkids.org", logo: "https://i.postimg.cc/7Zfjr6rD/NCMEC.webp" },
   { name: "SANTA ROSA PD", domain: "srcity.org", logo: "https://logo.clearbit.com/srcity.org" },
-  { name: "IWF", domain: "iwf.org.uk", logo: "https://upload.wikimedia.org/wikipedia/en/9/91/Internet_Watch_Foundation_logo.svg" }
+  { name: "IWF", domain: "iwf.org.uk", logo: "https://i.postimg.cc/hvD3y404/icon.webp" }
 ];
 
 const TEAM = [
   { name: "Boaz Acosta", role: "CEO / FOUNDER", tag: "OP-01", email: "boaz@intelguard.org", tg: "@bo_sint", isVerified: true },
-  { name: "Monroe Wright", role: "COO / OPS DIR", tag: "OP-02", email: "monroe@intelguard.org", tg: null },
-  { name: "John Davis", role: "SR INVESTIGATOR", tag: "OP-05", email: "john@intelguard.org", tg: null },
+  { name: "Monroe Wright", role: "COO / OPS DIR", tag: "OP-02", email: "monroe@intelguard.org", tg: null, isVerified: true },
+  { name: "John Davis", role: "SR INVESTIGATOR", tag: "OP-05", email: "john@intelguard.org", tg: null, isVerified: true },
   { name: "Vinnie Castro", role: "FIELD OPS", tag: "OP-09", email: "vinnie@intelguard.org", tg: null },
   { name: "Oliver Dudas", role: "OSINT SPEC", tag: "OP-12", email: "oliver@intelguard.org", tg: null },
-  { name: "Mason Woods", role: "ACADEMY CADET", tag: "TR-01", email: "Classified", tg: null },
 ];
 
 const WALLETS = [
-  { name: "BTC", addr: "bc1qyh5jdwqq7frw5fjdyxcgejhx79sjpm6pf3zfr3", color: "text-orange-500" },
+  { name: "BTC", addr: "bc1qyh5jdwqq7frw5fjdyxcgejhx79sjpm6pf3zfr3", logo: "https://i.postimg.cc/pLhc16Kc/2ced00750ccb894d02b95ba0a86c472f.webp" },
   { name: "ETH", addr: "0x690B9A9E9aa1349101842367582562691a62002d", color: "text-blue-400" },
   { name: "XMR", addr: "45VSTwXcBpFNoV6oaxnL6yBbw7oRPRJ2BCmonTeSnuJQQwdnikQzQhwVcYK73ttt1Rbn2F1TQmAUJDVncXM8qj8z9PmcAaD", color: "text-orange-600" },
   { name: "SOL", addr: "7vEshR7S9S9uPjRkH5K2JtJv1wV6f5m6PjRkH5K2JtJv", color: "text-green-400" },
