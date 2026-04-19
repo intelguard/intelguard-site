@@ -35,7 +35,7 @@ const LogoSVG = ({ className = "w-10 h-10" }) => (
 
 // --- Official Network Data ---
 const PARTNERS = [
-  { name: "nOSINT", domain: "nosint.org", logo: "https://logo.clearbit.com/nosint.org" },
+  { name: "nOSINT", domain: "nosint.org", logo: "https://i.postimg.cc/XYQmTCPS/photo-2026-01-24-03-28-02.jpg" },
   { name: "OSINTLeak", domain: "osintleak.com", logo: "https://logo.clearbit.com/osintleak.com" },
   { name: "OSINT Industries", domain: "osint.industries", logo: "https://logo.clearbit.com/osint.industries" },
   { name: "SEON", domain: "seon.io", logo: "https://logo.clearbit.com/seon.io" },
