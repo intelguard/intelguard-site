@@ -171,7 +171,7 @@ export default function App() {
           <LogoSVG className="w-8 h-8 text-blue-500 group-hover:scale-110 transition-transform" />
           <div className="flex flex-col">
             <span className="text-sm font-black tracking-widest text-white uppercase leading-none">IntelGuard</span>
-            <span className="text-[9px] font-mono text-blue-500/60 uppercase tracking-[0.3em] mt-1">Tactical Intake Portal</span>
+            <span className="text-[9px] font-mono text-blue-500/60 uppercase tracking-[0.3em] mt-1">Official NPO Portal</span>
           </div>
         </div>
 
@@ -297,7 +297,7 @@ export default function App() {
                    <LogoSVG className="w-40 h-40 text-blue-500 mb-8" />
                    <div className="space-y-2 text-center">
                      <div className="text-2xl font-black uppercase tracking-widest">INTELGUARD</div>
-                     <div className="text-[9px] font-mono text-white/30 uppercase tracking-[0.4em]">Decentralized Intelligence</div>
+                     <div className="text-[9px] font-mono text-white/30 uppercase tracking-[0.4em]">Made by Civilians. Fighting for Civilians.</div>
                    </div>
                    <div className="absolute bottom-6 w-full px-12">
                      <div className="flex justify-between items-center mb-2">
@@ -327,7 +327,7 @@ export default function App() {
                 Disrupting <br />Exploitation.
               </h2>
               <p className="text-white/40 font-mono text-sm uppercase leading-loose mb-10 max-w-md">
-                Our mission is measured in cases closed and data eradicated. We provide the link between civilian surveillance and law enforcement action.
+                Our mission is measured in cases closed and CSAM taken off the web. We provide the link between civilian surveillance and law enforcement action.
               </p>
             </div>
             
@@ -413,7 +413,7 @@ export default function App() {
                 <span className="font-black uppercase tracking-widest">IntelGuard</span>
               </div>
               <p className="text-[10px] font-mono text-white/20 uppercase max-w-xs leading-loose">
-                Established 2024. Operating as a decentralized collective for global cyber-intelligence.
+                Established 2025. Operating as a decentralized collective for global cyber-intelligence.
               </p>
             </div>
             
@@ -443,10 +443,10 @@ export default function App() {
           </div>
           
           <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <span className="text-[9px] font-mono text-white/10 uppercase tracking-widest">© 2024 IntelGuard Protocol // All Rights Reserved</span>
+            <span className="text-[9px] font-mono text-white/10 uppercase tracking-widest">© 2026 IntelGuard // All Rights Reserved</span>
             <div className="flex items-center gap-6">
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-               <span className="text-[9px] font-mono text-green-500/50 uppercase tracking-widest">Node Status: Online</span>
+               <span className="text-[9px] font-mono text-green-500/50 uppercase tracking-widest">Operations Status: Active</span>
             </div>
           </div>
         </div>
