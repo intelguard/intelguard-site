@@ -56,7 +56,7 @@ const INTL_AGENCIES = [
 const DOMESTIC_AGENCIES = [
   { name: "FBI", domain: "fbi.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" },
   { name: "DALLAS PD", domain: "dallaspolice.net", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Dallas_Police_Department_Badge.png" },
-  { name: "USSS", domain: "secretservice.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/United_States_Secret_Service_Seal.svg" },
+  { name: "USSS", domain: "secretservice.gov", logo: "https://i.postimg.cc/yY9V4vm2/Logo-of-the-United-States-Secret-Service.png" },
   { name: "TORRANCE PD", domain: "torranceca.gov", logo: "https://logo.clearbit.com/torranceca.gov" },
   { name: "ICAC", domain: "icactaskforce.org", logo: "https://logo.clearbit.com/icactaskforce.org" },
   { name: "NCMEC", domain: "missingkids.org", logo: "https://upload.wikimedia.org/wikipedia/en/d/da/NCMEC_logo.png" },
