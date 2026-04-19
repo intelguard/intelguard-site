@@ -73,7 +73,7 @@ const TEAM = [
 ];
 
 const WALLETS = [
-  { name: "BTC", addr: "bc1qyh5jdwqq7frw5fjdyxcgejhx79sjpm6pf3zfr3", logo: "https://i.postimg.cc/pLhc16Kc/2ced00750ccb894d02b95ba0a86c472f.webp" },
+  { name: "BTC", addr: "bc1qyh5jdwqq7frw5fjdyxcgejhx79sjpm6pf3zfr3", color: "text-orange-500" },
   { name: "ETH", addr: "0x690B9A9E9aa1349101842367582562691a62002d", color: "text-blue-400" },
   { name: "XMR", addr: "45VSTwXcBpFNoV6oaxnL6yBbw7oRPRJ2BCmonTeSnuJQQwdnikQzQhwVcYK73ttt1Rbn2F1TQmAUJDVncXM8qj8z9PmcAaD", color: "text-orange-600" },
   { name: "SOL", addr: "7vEshR7S9S9uPjRkH5K2JtJv1wV6f5m6PjRkH5K2JtJv", color: "text-green-400" },
