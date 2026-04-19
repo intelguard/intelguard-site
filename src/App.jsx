@@ -272,12 +272,12 @@ export default function App() {
                 <Radar className="w-4 h-4 animate-spin-slow" /> Threat Monitoring Active
               </div>
               <h1 className="text-6xl md:text-[100px] font-black leading-[0.85] tracking-tighter uppercase mb-8">
-                Shadow <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400 italic">Watchers</span> <br />
-                Protocol.
+                Protecting <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400 italic">The</span> <br />
+                Ignored.
               </h1>
               <p className="text-lg md:text-xl text-white/40 font-mono uppercase tracking-tight max-w-xl mb-12 leading-relaxed">
-                Elite non-profit OSINT collective dedicated to the identification and dismantling of global exploitation networks.
+                An experienced non-profit organization that focuses on dismantling CSAM networks and investigating crimes against children.
               </p>
               <div className="flex flex-wrap gap-6">
                 <GlowingButton onClick={() => window.open('https://forms.gle/MkUCRvdXBghA2HQm6', '_blank')}>
