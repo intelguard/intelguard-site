@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 
 // --- Tactical SVG Assets ---
-
 const LogoSVG = ({ className = "w-10 h-10" }) => (
   <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M50 5L15 20V45C15 66.5 30 86.5 50 95C70 86.5 85 66.5 85 45V20L50 5Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="2"/>
@@ -34,9 +33,39 @@ const LogoSVG = ({ className = "w-10 h-10" }) => (
   </svg>
 );
 
-// --- Content Data ---
+// --- Official Network Data ---
+const PARTNERS = [
+  { name: "nOSINT", domain: "nosint.org", logo: "https://logo.clearbit.com/nosint.org" },
+  { name: "OSINTLeak", domain: "osintleak.com", logo: "https://logo.clearbit.com/osintleak.com" },
+  { name: "OSINT Industries", domain: "osint.industries", logo: "https://logo.clearbit.com/osint.industries" },
+  { name: "SEON", domain: "seon.io", logo: "https://logo.clearbit.com/seon.io" },
+  { name: "BreachHub", domain: "breachhub.org", logo: "https://logo.clearbit.com/breachhub.org" }
+];
+
+const INTL_AGENCIES = [
+  { name: "INTERPOL", domain: "interpol.int", logo: "https://upload.wikimedia.org/wikipedia/en/e/e4/Interpol_logo.svg" },
+  { name: "ROMANIAN POLICE", domain: "politiaromana.ro", logo: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Poli%C8%9Bia_Rom%C3%A2n%C4%83.svg" },
+  { name: "AUSTRALIAN FEDERAL POLICE", domain: "afp.gov.au", logo: "https://upload.wikimedia.org/wikipedia/en/b/ba/Australian_Federal_Police_logo.svg" },
+  { name: "CITY OF LONDON POLICE", domain: "cityoflondon.police.uk", logo: "https://upload.wikimedia.org/wikipedia/en/f/f5/City_of_London_Police_logo.svg" },
+  { name: "NIGERIA POLICE FORCE", domain: "nccc.npf.gov.ng", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Nigeria_Police_logo.svg" },
+  { name: "DORSET POLICE", domain: "dorset.police.uk", logo: "https://logo.clearbit.com/dorset.police.uk" },
+  { name: "MINISTRY OF INTERIOR", domain: "interieur.gouv.fr", logo: "https://upload.wikimedia.org/wikipedia/en/2/22/Logo_of_the_Ministry_of_the_Interior_%28France%29.svg" },
+  { name: "EUROPOL", domain: "europol.europa.eu", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Europol_logo.svg" }
+];
+
+const DOMESTIC_AGENCIES = [
+  { name: "FBI", domain: "fbi.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" },
+  { name: "DALLAS PD", domain: "dallaspolice.net", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Dallas_Police_Department_Badge.png" },
+  { name: "USSS", domain: "secretservice.gov", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/United_States_Secret_Service_Seal.svg" },
+  { name: "TORRANCE PD", domain: "torranceca.gov", logo: "https://logo.clearbit.com/torranceca.gov" },
+  { name: "ICAC", domain: "icactaskforce.org", logo: "https://logo.clearbit.com/icactaskforce.org" },
+  { name: "NCMEC", domain: "missingkids.org", logo: "https://upload.wikimedia.org/wikipedia/en/d/da/NCMEC_logo.png" },
+  { name: "SANTA ROSA PD", domain: "srcity.org", logo: "https://logo.clearbit.com/srcity.org" },
+  { name: "IWF", domain: "iwf.org.uk", logo: "https://upload.wikimedia.org/wikipedia/en/9/91/Internet_Watch_Foundation_logo.svg" }
+];
+
 const TEAM = [
-  { name: "Boaz Acosta", role: "CEO / FOUNDER", tag: "OP-01", email: "boaz@intelguard.org", tg: "@bo_sint" },
+  { name: "Boaz Acosta", role: "CEO / FOUNDER", tag: "OP-01", email: "boaz@intelguard.org", tg: "@bo_sint", isVerified: true },
   { name: "Monroe Wright", role: "COO / OPS DIR", tag: "OP-02", email: "monroe@intelguard.org", tg: null },
   { name: "John Davis", role: "SR INVESTIGATOR", tag: "OP-05", email: "john@intelguard.org", tg: null },
   { name: "Vinnie Castro", role: "FIELD OPS", tag: "OP-09", email: "vinnie@intelguard.org", tg: null },
@@ -78,6 +107,37 @@ const GlowingButton = ({ children, onClick, variant = "primary" }) => {
     </button>
   );
 };
+
+// Tactical Marquee Component
+const MarqueeStream = ({ items, reverse = false, label }) => (
+  <div className="relative mb-8 group/stream">
+    <div className="absolute left-6 top-1/2 -translate-y-1/2 z-20 text-[9px] font-mono text-blue-500 uppercase tracking-[0.4em] bg-[#050505] px-4 py-2 border border-white/10 rounded-full hidden md:block shadow-xl">
+      {label}
+    </div>
+    {/* Mask edges for a smooth fade effect */}
+    <div className="flex overflow-hidden relative" style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+      <div className={`flex w-max items-center gap-16 py-4 ${reverse ? 'animate-marquee-reverse' : 'animate-marquee'} hover:[animation-play-state:paused]`}>
+        {[...items, ...items, ...items].map((item, i) => (
+          <a key={i} href={`https://${item.domain}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/item opacity-50 hover:opacity-100 transition-all duration-500 grayscale hover:grayscale-0 cursor-pointer">
+            <div className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-xl p-2.5 border border-white/5 group-hover/item:border-blue-500/50 transition-colors shadow-lg">
+               <img 
+                  src={item.logo} 
+                  alt={item.name} 
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+               />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tighter text-white uppercase leading-none mb-1">{item.name}</span>
+              <span className="text-[9px] font-mono text-blue-500/80 tracking-[0.2em] uppercase">{item.domain} <ExternalLink className="inline w-2 h-2 ml-1" /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 
 export default function App() {
   const [activePage, setActivePage] = useState('home');
@@ -126,7 +186,7 @@ export default function App() {
               }}
               className="text-[10px] font-mono font-bold uppercase tracking-widest text-white/40 hover:text-blue-400 transition-colors"
             >
-              // {item}
+              {"//"} {item}
             </button>
           ))}
           <GlowingButton onClick={() => setActivePage('team')} variant="secondary">
@@ -156,7 +216,14 @@ export default function App() {
                 <div className="absolute top-4 right-6 text-[9px] font-mono text-white/10 group-hover:text-blue-500/40 transition-colors">[{p.tag}]</div>
                 <div className="mb-12">
                   <div className="text-[10px] font-mono text-blue-500 mb-2 tracking-widest uppercase">{p.role}</div>
-                  <h3 className="text-2xl font-black uppercase tracking-tight">{p.name}</h3>
+                  <h3 className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+                    {p.name}
+                    {p.isVerified && (
+                      <svg className="w-5 h-5 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.92-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.337 2.25c-.416-.165-.866-.25-1.336-.25-2.21 0-3.92 1.79-3.92 4 0 .495.083.965.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.71 3.998 3.92 3.998.47 0 .92-.086 1.335-.253.52 1.335 1.828 2.25 3.337 2.25 1.51 0 2.818-.915 3.338-2.25.416.167.866.253 1.336.253 2.21 0 3.92-1.788 3.92-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.346-.64.346H10.9c-.246 0-.477-.115-.625-.31l-2.167-2.833c-.198-.26-.145-.633.115-.83.26-.198.632-.145.83.115l1.848 2.417 3.993-5.99c.19-.283.573-.357.856-.165.283.19.358.574.166.85z"/>
+                      </svg>
+                    )}
+                  </h3>
                 </div>
                 <div className="space-y-4 pt-6 border-t border-white/5">
                   <div 
@@ -227,7 +294,7 @@ export default function App() {
               <div className="relative">
                 <div className="absolute inset-0 bg-blue-500/10 blur-[60px] rounded-full" />
                 <TacticalCard className="relative z-10 aspect-square flex flex-col items-center justify-center border-white/10">
-                   <div className="text-[10px] font-mono text-blue-500/40 absolute top-6 left-6 uppercase tracking-widest">System_Auth_v11.4</div>
+                   <div className="text-[10px] font-mono text-blue-500/40 absolute top-6 left-6 uppercase tracking-widest">System_Auth_v11.5</div>
                    <LogoSVG className="w-40 h-40 text-blue-500 mb-8" />
                    <div className="space-y-2 text-center">
                      <div className="text-2xl font-black uppercase tracking-widest">INTELGUARD</div>
@@ -273,7 +340,7 @@ export default function App() {
               </div>
               <div className="bg-[#0A0A0A] p-12 group">
                 <div className="text-blue-500 mb-6 group-hover:scale-110 transition-transform"><Terminal className="w-8 h-8" /></div>
-                <div className="text-6xl font-black mb-2">6<span className="text-blue-600">+</span></div>
+                <div className="text-6xl font-black mb-2">8<span className="text-blue-600">+</span></div>
                 <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">TB Data Eradicated</div>
               </div>
             </div>
@@ -281,21 +348,24 @@ export default function App() {
         </div>
       </section>
 
-      {/* NETWORK / AGENCIES */}
-      <section id="network" className="py-24 bg-black overflow-hidden relative">
-        <div className="flex items-center gap-32 whitespace-nowrap animate-marquee opacity-20">
-          {['FBI', 'INTERPOL', 'EUROPOL', 'AFP', 'USSS', 'NCA', 'POLICE'].map((n, i) => (
-             <div key={i} className="flex items-center gap-8">
-               <span className="text-5xl font-black tracking-tighter text-white/50">{n}</span>
-               <div className="w-4 h-4 bg-blue-600 rotate-45" />
-             </div>
-          ))}
-          {['FBI', 'INTERPOL', 'EUROPOL', 'AFP', 'USSS', 'NCA', 'POLICE'].map((n, i) => (
-             <div key={i+10} className="flex items-center gap-8">
-               <span className="text-5xl font-black tracking-tighter text-white/50">{n}</span>
-               <div className="w-4 h-4 bg-blue-600 rotate-45" />
-             </div>
-          ))}
+      {/* NETWORK / MULTI-TIER AGENCIES */}
+      <section id="network" className="py-32 bg-black border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+           <div className="flex items-center gap-3 text-blue-500 font-mono text-[10px] tracking-[0.4em] uppercase mb-4">
+              <Globe className="w-4 h-4" /> Global Reach
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Operational <span className="text-blue-600">Network.</span></h2>
+        </div>
+        
+        <div className="flex flex-col gap-6 pt-10 border-t border-white/5">
+          {/* Stream 1: OSINT Partners */}
+          <MarqueeStream items={PARTNERS} label="STRATEGIC PARTNERS" />
+          
+          {/* Stream 2: International Cooperatives (Reversed) */}
+          <MarqueeStream items={INTL_AGENCIES} reverse={true} label="INTL. COOPERATIVES" />
+          
+          {/* Stream 3: Domestic Cooperatives */}
+          <MarqueeStream items={DOMESTIC_AGENCIES} label="DOMESTIC ALLIES" />
         </div>
       </section>
 
@@ -354,6 +424,22 @@ export default function App() {
                 <a href="mailto:contact@intelguard.org" className="block text-[10px] font-mono text-white/40 hover:text-white uppercase transition-colors">{"//"} General: contact@intelguard.org</a>
                 <a href="mailto:tipline@intelguard.org" className="block text-[10px] font-mono text-red-500/60 hover:text-red-500 uppercase transition-colors">{"//"} Urgent: tipline@intelguard.org</a>
               </div>
+              
+              <div className="space-y-4">
+                <div className="text-[10px] font-mono text-blue-500 uppercase tracking-widest mb-6">Social_Network</div>
+                <a href="https://t.me/intelguardian" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[10px] font-mono text-white/40 hover:text-white uppercase transition-colors">
+                  <svg className="w-4 h-4 text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.18-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.21 3.45-.49.34-.94.5-1.35.49-.45-.01-1.31-.25-1.95-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.48.98-.75 3.83-1.67 6.38-2.77 7.65-3.3 3.63-1.52 4.39-1.78 4.88-1.79.11 0 .35.03.48.14.11.09.14.22.15.34.01.07.01.17 0 .28z"/>
+                  </svg>
+                  {"//"} Telegram
+                </a>
+                <a href="https://x.com/intelguardorg" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[10px] font-mono text-white/40 hover:text-white uppercase transition-colors">
+                  <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  {"//"} Twitter
+                </a>
+              </div>
             </div>
           </div>
           
@@ -369,9 +455,12 @@ export default function App() {
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .animate-marquee { animation: marquee 20s linear infinite; }
+        @keyframes marquee-reverse { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+        .animate-marquee { animation: marquee 60s linear infinite; }
+        .animate-marquee-reverse { animation: marquee-reverse 60s linear infinite; }
         .animate-spin-slow { animation: spin 8s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        html { scroll-behavior: smooth; }
       `}} />
     </div>
   );
